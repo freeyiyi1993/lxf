@@ -1,0 +1,41 @@
+#!/bin/bash
+
+
+function ssh_server(){
+	name=$(grep "$1" /home/lxf/pd.txt|awk -F "," '{print $1}')
+	host=$(grep "$1" /home/lxf/pd.txt|awk -F "," '{print $2}')
+	port=$(grep "$1" /home/lxf/pd.txt|awk -F "," '{print $3}')
+	pass=$(grep "$1" /home/lxf/pd.txt|awk -F "," '{print $4}')
+	echo "${name}         $host" 
+	read -p "Are you sure to Connect this server[${name}_$host]?[Y/N]:" key
+	#echo $key
+	case $key in
+		yes|y|Y|yes )
+			/home/lxf/Documents/py/expect.sh $host $pass $port $2
+			;;
+		*)
+		echo "Good bye~"
+		exit 1
+		;;
+	esac
+}
+
+
+
+number=$(grep -c "$1" /home/lxf/pd.txt)
+if [[ $number -eq 1 ]]; then
+	ssh_server $1 $2
+fi
+if [ ! $number -eq 1 ]; then
+	hits=$(grep "$1" /home/lxf/pd.txt)
+	for i in $hits; do
+		echo $i |awk -F ','  '{printf "%+25s,%-16s\n",$1,$2}'
+	done
+	read -p "Choose Server which will you Connect:" info
+	#echo $2
+	ssh_server $info $2
+fi
+
+
+
+
